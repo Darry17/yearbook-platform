@@ -47,10 +47,11 @@ function EditProfile() {
   }, []);
 
   const handleSearch = () => {
-    const filtered = profiles.filter((profile) =>
-      profile.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      profile.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = profiles.filter((profile) => {
+      const firstName = profile.first_name ? profile.first_name.toLowerCase() : "";
+      const lastName = profile.last_name ? profile.last_name.toLowerCase() : "";
+      return firstName.includes(searchTerm.toLowerCase()) || lastName.includes(searchTerm.toLowerCase());
+    });
     setFilteredProfiles(filtered);
   };
 
