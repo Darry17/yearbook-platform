@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';  // Import Link for navigation
-import './Sidebar.css';  // Your custom sidebar styles
+import './css/Sidebar.css';  // Your custom sidebar styles
 
 function Sidebar() {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Configure.css';
+import './css/Configure.css';
 
 const Configure = () => {
   return (

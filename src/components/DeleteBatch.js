@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './DeleteBatch.css';
+import './css/DeleteBatch.css';
 
 function DeleteBatch() {
     const [formData, setFormData] = useState({

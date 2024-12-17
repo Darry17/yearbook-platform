@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AddBatch.css';
+import './css/AddBatch.css';
 
 function AddBatch() {
   const [formData, setFormData] = useState({

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './Transaction.css'; // Import the Transaction-specific CSS file
+import './css/Transaction.css'; // Import the Transaction-specific CSS file
 
 const Transaction = () => {
   const [url, setUrl] = useState("");

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './CreateBatch.css';
+import './css/CreateBatch.css';
 
 const CreateBatch = () => {
   const [batchYearRange, setBatchYearRange] = useState('');
