@@ -9,6 +9,8 @@ const kmeans = require("ml-kmeans");
 const skmeans = require('skmeans');
 
 // Enable CORS and JSON middleware
+
+// IAN IAN IAN
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
 
