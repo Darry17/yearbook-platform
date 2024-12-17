@@ -35,15 +35,15 @@ app.get('/api/yearbook-batch/:batchId', (req, res) => {
       IFNULL(yp.birthdate, 'N/A') AS birthdate,
       yp.ambition,
       yb.batch_type
-    FROM yearbookprofiles yp
-    JOIN yearbookbatches yb ON yp.batch_id = yb.batch_id
-    LEFT JOIN barangays b ON yp.barangay = b.barangay_id
-    LEFT JOIN cities c ON yp.city_or_municipality = c.city_id
-    LEFT JOIN provinces p ON yp.province = p.province_id
-    LEFT JOIN regions r ON yp.region = r.region_id
-    WHERE yb.batch_id = ?
-    ORDER BY yb.batch_type, yp.last_name;
-  `;
+      FROM yearbookprofiles yp
+      JOIN yearbookbatches yb ON yp.batch_id = yb.batch_id
+      LEFT JOIN barangays b ON yp.barangay = b.barangay_id
+      LEFT JOIN cities c ON yp.city_or_municipality = c.city_id
+      LEFT JOIN provinces p ON yp.province = p.province_id
+      LEFT JOIN regions r ON yp.region = r.region_id
+      WHERE yb.batch_id = ?
+      ORDER BY yb.batch_type, yp.last_name;
+    `;
 
   db.query(query, [batchId], (error, results) => {
     if (error) {
