@@ -11,7 +11,6 @@ function Sidebar() {
       <Link to="/main/configure" className="sidebar-link">Configure</Link>
       <Link to="/main/accounts" className="sidebar-link">Accounts</Link>
       <Link to="/main/records" className="sidebar-link">Records</Link>
-      <Link to="/main/logs" className="sidebar-link">Logs</Link>
       <Link to="/main/analytics" className="sidebar-link">Analytics</Link>
       <div className="admin-section">
         <p>Admin</p>

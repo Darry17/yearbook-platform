@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./EditProfile.css"; // Ensure the updated CSS file is linked
+import "./css/EditProfile.css";
 
 function Records() {
   const [profiles, setProfiles] = useState([]);
