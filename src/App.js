@@ -7,6 +7,7 @@ import Configure from './components/Configure';
 import CreateBatch from './components/CreateBatch';
 import AddBatch from './components/AddBatch';
 import EditProfile from './components/EditProfile';
+import EditPrototype from './components/EditPrototype';
 import YearbookProfileForm from './components/YearbookProfileForm';
 import Accounts from './components/Accounts';
 import Records from './components/Records';
@@ -25,7 +26,7 @@ function App() {
           <Route path="configure/create" element={<CreateBatch />} />
           <Route path="configure/add" element={<YearbookProfileForm />} />
           <Route path="configure/delete" element={<SearchAndDelete />} />
-          <Route path="configure/edit" element={<EditProfile />} />
+          <Route path="configure/edit" element={<EditPrototype />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="records" element={<Records />} />
           <Route path="analytics" element={<Analytics />} /> {/* Add Analytics Route */}

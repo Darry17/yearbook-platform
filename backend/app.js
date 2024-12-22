@@ -9,10 +9,10 @@ const kmeans = require("ml-kmeans");
 const skmeans = require('skmeans');
 
 // Enable CORS and JSON middleware
-
-// IAN IAN IAN darry darry
 app.use(cors({ origin: "http://localhost:3000" }));
+
 app.use(express.json());
+
 
 // Test Route
 app.get("/api/test", (req, res) => {
@@ -446,84 +446,54 @@ app.get('/api/yearbook-graduation-ranges', (req, res) => {
   });
 });
 
-// Edit a yearbook profile
-app.put("/api/edit-profile/:id", (req, res) => {
-  const { id } = req.params;
-  const {
-    first_name, middle_name, last_name,
-    course, batch_id, email, contact_number,
-    region, province, city_or_municipality,
-    barangay, birthdate, ambition
-  } = req.body;
+// Get all profiles
+app.get('/profiles', (req, res) => {
+  const query = 'SELECT * FROM yearbookprofiles';
+  db.query(query, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
 
-  console.log("Edit Profile Request - ID:", id);
-  console.log("Request Body:", req.body);
+// Get a specific profile by ID
+app.get('/profiles/:profile_id', (req, res) => {
+  const { profile_id } = req.params;
+  console.log('Request received for profile ID:', profile_id);  // Log the incoming profile_id
+  
+  const query = 'SELECT * FROM yearbookprofiles WHERE profile_id = ?';
+  db.query(query, [profile_id], (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+    
+    console.log('Query Results:', results);  // Log the query result
+    
+    if (results.length > 0) {
+      res.json(results[0]);  // Respond with the specific profile
+    } else {
+      res.status(404).json({ message: 'Profile not found' });
+    }
+  });
+});
 
-  if (!id || !first_name || !last_name || !course || !batch_id || !email || !contact_number) {
-    console.error("Validation failed: Missing required fields.");
-    return res.status(400).json({
-      error: "Missing required fields. Please provide all necessary details.",
-    });
-  }
 
+// Update a profile
+app.put('/profiles/:profile_id', (req, res) => {
+  const { profile_id } = req.params;
+  const { first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition } = req.body;
   const query = `
     UPDATE yearbookprofiles 
-    SET 
-      first_name = ?, middle_name = ?, last_name = ?, 
-      course = ?, batch_id = ?, email = ?, contact_number = ?, 
-      region = ?, province = ?, city_or_municipality = ?, 
-      barangay = ?, birthdate = ?, ambition = ? 
+    SET first_name = ?, middle_name = ?, last_name = ?, course = ?, email = ?, contact_number = ?, birthdate = ?, ambition = ? 
     WHERE profile_id = ?
   `;
-  const values = [
-    first_name, middle_name || null, last_name, 
-    course, batch_id, email, contact_number, 
-    region || null, province || null, city_or_municipality || null, 
-    barangay || null, birthdate || null, ambition || null, id
-  ];
-
-  console.log("Executing SQL Query:", query);
-  console.log("Query Values:", values);
-
-  db.query(query, values, (error, results) => {
-    if (error) {
-      console.error("Database error while updating profile:", error);
-      return res.status(500).json({ error: "Failed to update profile due to a database error." });
-    }
-
-    if (results.affectedRows === 0) {
-      console.warn("No profile found with the provided ID:", id);
-      return res.status(404).json({ error: "Profile not found." });
-    }
-
-    console.log("Profile updated successfully.");
-    res.status(200).json({ message: "Profile updated successfully!" });
+  db.query(query, [first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition, profile_id], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Profile updated successfully.' });
   });
 });
 
-// Fetch a specific profile by ID
-app.get('/api/profile/:id', (req, res) => {
-  const { id } = req.params;
-  const query = `
-    SELECT * 
-    FROM yearbookprofiles 
-    WHERE profile_id = ?`;
-
-  db.query(query, [id], (error, results) => {
-    if (error) {
-      console.error("Error fetching profile:", error);
-      res.status(500).json({ error: "Failed to fetch profile" });
-    } else if (results.length === 0) {
-      res.status(404).json({ error: "Profile not found" });
-    } else {
-      res.status(200).json(results[0]); // Return the first result
-    }
-  });
-});
-
-
-// Start the server
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const port = process.env.PORT || 5000;
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
 });

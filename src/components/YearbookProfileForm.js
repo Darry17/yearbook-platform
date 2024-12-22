@@ -255,7 +255,8 @@ function YearbookProfileForm() {
 
       <label>Contact Number:</label>
       <input
-        type="text"
+        type="number"
+        minlength={11}
         name="contactNumber"
         value={formData.contactNumber}
         onChange={handleInputChange}
