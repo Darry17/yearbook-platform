@@ -68,7 +68,6 @@ const App = () => {
       <table border="1">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Firstname</th>
             <th>Middlename</th>
             <th>Lastname</th>
@@ -83,7 +82,6 @@ const App = () => {
         <tbody>
           {profiles.map((profile) => (
             <tr key={profile.profile_id}>
-              <td>{profile.profile_id}</td>
               {['first_name', 'middle_name', 'last_name', 'course', 'email', 'contact_number', 'birthdate', 'ambition'].map(
                 (field) => (
                   <td key={field}>
