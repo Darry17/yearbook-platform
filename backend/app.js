@@ -10,9 +10,7 @@ const skmeans = require('skmeans');
 
 // Enable CORS and JSON middleware
 app.use(cors({ origin: "http://localhost:3000" }));
-
 app.use(express.json());
-
 
 // Test Route
 app.get("/api/test", (req, res) => {
@@ -22,9 +20,6 @@ app.get("/api/test", (req, res) => {
 // Yearbook Page - Fetch alumni by batch
 app.get('/api/yearbook-batch/:batchId', (req, res) => {
   const { batchId } = req.params;
-
-  // Debug log to ensure batchId is received correctly
-  console.log("Received Batch ID:", batchId);
 
   const query = `
     SELECT 
@@ -58,13 +53,9 @@ app.get('/api/yearbook-batch/:batchId', (req, res) => {
       return res.status(404).json({ error: "No alumni found for the specified batch" });
     }
 
-    console.log("Query Results:", results); // Debug log to verify fetched results
     res.status(200).json(results);
   });
 });
-
-
-
 
 // Endpoint to fetch all yearbook batches
 app.get('/api/yearbook-batches', (req, res) => {
@@ -132,6 +123,7 @@ app.post("/api/create-batch", (req, res) => {
   });
 });
 
+// Fetch all batches
 app.get("/api/get-batches", (req, res) => {
   const query = "SELECT batch_id, batch_year_range, batch_type FROM yearbookbatches ORDER BY batch_year_range ASC";
   db.query(query, (error, results) => {
@@ -255,7 +247,136 @@ app.get("/api/records", (req, res) => {
   });
 });
 
-//ANALYTICS STUFFS
+// Add a new yearbook profile and automatically create a user account
+app.post("/api/yearbook-profiles", async (req, res) => {
+  const {
+    batch_id,
+    first_name,
+    middle_name,
+    last_name,
+    course,
+    email,
+    contact_number,
+    region,
+    province,
+    city_or_municipality,
+    barangay,
+    birthdate,
+    ambition,
+    profile_photo,
+  } = req.body;
+
+  try {
+    // Generate RSA keys
+    const key = new NodeRSA({ b: 512 });
+    const privateKey = key.exportKey("private");
+    const publicKey = key.exportKey("public").replace(/(-----.*-----|\s)/g, "");
+    const hashedPassword = await bcrypt.hash(privateKey, 10);
+
+    // Insert into Users table
+    const userQuery =
+      "INSERT INTO Users (public_key, private_key) VALUES (?, ?)";
+    db.query(userQuery, [publicKey, hashedPassword], (userError, userResults) => {
+      if (userError) {
+        console.error("Error creating user account:", userError);
+        return res.status(500).json({ error: "Failed to create user account" });
+      }
+
+      const userId = userResults.insertId;
+
+      // Insert into YearbookProfiles table
+      const profileQuery = `
+        INSERT INTO YearbookProfiles 
+        (user_id, batch_id, first_name, middle_name, last_name, course, email, contact_number, region, province, city_or_municipality, barangay, birthdate, ambition, profile_photo, public_key)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      db.query(
+        profileQuery,
+        [
+          userId,
+          batch_id,
+          first_name,
+          middle_name,
+          last_name,
+          course,
+          email,
+          contact_number,
+          region,
+          province,
+          city_or_municipality,
+          barangay,
+          birthdate,
+          ambition,
+          profile_photo,
+          publicKey,
+        ],
+        (profileError, profileResults) => {
+          if (profileError) {
+            console.error("Error adding profile:", profileError);
+            return res.status(500).json({ error: "Failed to add profile" });
+          }
+          res.status(201).json({
+            message: "Profile and user account created successfully",
+            profileId: profileResults.insertId,
+            publicKey,
+            privateKey,
+          });
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get all profiles for Edit profile section
+app.get('/profiles', (req, res) => {
+  const query = 'SELECT * FROM yearbookprofiles';
+  db.query(query, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Get a specific profile by ID
+app.get('/profiles/:profile_id', (req, res) => {
+  const { profile_id } = req.params;
+  console.log('Request received for profile ID:', profile_id);  // Log the incoming profile_id
+  
+  const query = 'SELECT * FROM yearbookprofiles WHERE profile_id = ?';
+  db.query(query, [profile_id], (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+    
+    console.log('Query Results:', results);  // Log the query result
+    
+    if (results.length > 0) {
+      res.json(results[0]);  // Respond with the specific profile
+    } else {
+      res.status(404).json({ message: 'Profile not found' });
+    }
+  });
+});
+
+// Update a profile
+app.put('/profiles/:profile_id', (req, res) => {
+  const { profile_id } = req.params;
+  const { first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition } = req.body;
+  const query = `
+    UPDATE yearbookprofiles 
+    SET first_name = ?, middle_name = ?, last_name = ?, course = ?, email = ?, contact_number = ?, birthdate = ?, ambition = ? 
+    WHERE profile_id = ?
+  `;
+  db.query(query, [first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition, profile_id], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Profile updated successfully.' });
+  });
+});
+
 // Fetch analytics data
 app.get("/api/analytics", (req, res) => {
   const queries = {
@@ -351,148 +472,8 @@ app.get("/api/clustering-graduates-by-batch", async (req, res) => {
   }
 });
 
-// Add a new yearbook profile and automatically create a user account
-app.post("/api/yearbook-profiles", async (req, res) => {
-  const {
-    batch_id,
-    first_name,
-    middle_name,
-    last_name,
-    course,
-    email,
-    contact_number,
-    region,
-    province,
-    city_or_municipality,
-    barangay,
-    birthdate,
-    ambition,
-    profile_photo,
-  } = req.body;
 
-  try {
-    // Generate RSA keys
-    const key = new NodeRSA({ b: 512 });
-    const privateKey = key.exportKey("private");
-    const publicKey = key.exportKey("public").replace(/(-----.*-----|\s)/g, "");
-    const hashedPassword = await bcrypt.hash(privateKey, 10);
-
-    // Insert into Users table
-    const userQuery =
-      "INSERT INTO Users (public_key, private_key) VALUES (?, ?)";
-    db.query(userQuery, [publicKey, hashedPassword], (userError, userResults) => {
-      if (userError) {
-        console.error("Error creating user account:", userError);
-        return res.status(500).json({ error: "Failed to create user account" });
-      }
-
-      const userId = userResults.insertId;
-
-      // Insert into YearbookProfiles table
-      const profileQuery = `
-        INSERT INTO YearbookProfiles 
-        (user_id, batch_id, first_name, middle_name, last_name, course, email, contact_number, region, province, city_or_municipality, barangay, birthdate, ambition, profile_photo, public_key)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      db.query(
-        profileQuery,
-        [
-          userId,
-          batch_id,
-          first_name,
-          middle_name,
-          last_name,
-          course,
-          email,
-          contact_number,
-          region,
-          province,
-          city_or_municipality,
-          barangay,
-          birthdate,
-          ambition,
-          profile_photo,
-          publicKey,
-        ],
-        (profileError, profileResults) => {
-          if (profileError) {
-            console.error("Error adding profile:", profileError);
-            return res.status(500).json({ error: "Failed to add profile" });
-          }
-          res.status(201).json({
-            message: "Profile and user account created successfully",
-            profileId: profileResults.insertId,
-            publicKey,
-            privateKey,
-          });
-        }
-      );
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-app.get('/api/yearbook-graduation-ranges', (req, res) => {
-  const query = 'SELECT batch_id, batch_year_range FROM yearbookbatches ORDER BY batch_year_range';
-  db.query(query, (error, results) => {
-    if (error) {
-      console.error('Error fetching graduation years:', error);
-      res.status(500).json({ error: 'Failed to fetch graduation years' });
-    } else {
-      res.status(200).json(results);
-    }
-  });
-});
-
-// Get all profiles
-app.get('/profiles', (req, res) => {
-  const query = 'SELECT * FROM yearbookprofiles';
-  db.query(query, (err, results) => {
-    if (err) throw err;
-    res.json(results);
-  });
-});
-
-// Get a specific profile by ID
-app.get('/profiles/:profile_id', (req, res) => {
-  const { profile_id } = req.params;
-  console.log('Request received for profile ID:', profile_id);  // Log the incoming profile_id
-  
-  const query = 'SELECT * FROM yearbookprofiles WHERE profile_id = ?';
-  db.query(query, [profile_id], (err, results) => {
-    if (err) {
-      console.error('Error executing query:', err);
-      return res.status(500).json({ message: 'Internal Server Error' });
-    }
-    
-    console.log('Query Results:', results);  // Log the query result
-    
-    if (results.length > 0) {
-      res.json(results[0]);  // Respond with the specific profile
-    } else {
-      res.status(404).json({ message: 'Profile not found' });
-    }
-  });
-});
-
-
-// Update a profile
-app.put('/profiles/:profile_id', (req, res) => {
-  const { profile_id } = req.params;
-  const { first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition } = req.body;
-  const query = `
-    UPDATE yearbookprofiles 
-    SET first_name = ?, middle_name = ?, last_name = ?, course = ?, email = ?, contact_number = ?, birthdate = ?, ambition = ? 
-    WHERE profile_id = ?
-  `;
-  db.query(query, [first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition, profile_id], (err, result) => {
-    if (err) throw err;
-    res.json({ message: 'Profile updated successfully.' });
-  });
-});
-
+// Server init
 const port = process.env.PORT || 5000;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
