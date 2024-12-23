@@ -6,7 +6,6 @@ import Transaction from './components/Transaction';
 import Configure from './components/Configure';
 import CreateBatch from './components/CreateBatch';
 import AddBatch from './components/AddBatch';
-import EditProfile from './components/EditProfile';
 import EditPrototype from './components/EditPrototype';
 import YearbookProfileForm from './components/YearbookProfileForm';
 import Accounts from './components/Accounts';
