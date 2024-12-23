@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './css/EditPrototype.css';
 
 const App = () => {
   const [profiles, setProfiles] = useState([]);
@@ -63,9 +64,9 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Yearbook Profiles</h1>
-      <table border="1">
+    <div className="app-container">
+      <h1 className="app-header">Yearbook Profiles</h1>
+      <table className="profiles-table">
         <thead>
           <tr>
             <th>Firstname</th>
@@ -81,12 +82,13 @@ const App = () => {
         </thead>
         <tbody>
           {profiles.map((profile) => (
-            <tr key={profile.profile_id}>
+            <tr key={profile.profile_id} className="profile-row">
               {['first_name', 'middle_name', 'last_name', 'course', 'email', 'contact_number', 'birthdate', 'ambition'].map(
                 (field) => (
-                  <td key={field}>
+                  <td key={field} className="profile-cell">
                     {editProfile.profile_id === profile.profile_id ? (
                       <input
+                        className="edit-input"
                         type="text"
                         name={field}
                         value={editProfile[field] || ''}
@@ -98,11 +100,12 @@ const App = () => {
                   </td>
                 )
               )}
-              <td>
+              <td className="actions-cell">
                 {editProfile.profile_id === profile.profile_id ? (
-                  <button onClick={() => handleEditSubmit(profile.profile_id)}>Save</button>
+                  <button className="save-button" onClick={() => handleEditSubmit(profile.profile_id)}>Save</button>
                 ) : (
                   <button
+                    className="edit-button"
                     onClick={() =>
                       setEditProfile({
                         profile_id: profile.profile_id,
