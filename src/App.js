@@ -5,12 +5,13 @@ import Yearbook from './components/Yearbook';
 import Transaction from './components/Transaction';
 import Configure from './components/Configure';
 import CreateBatch from './components/CreateBatch';
-import AddBatch from './components/AddBatch';
+// import AddBatch from './components/AddBatch';
 import EditPrototype from './components/EditPrototype';
 import YearbookProfileForm from './components/YearbookProfileForm';
 import Accounts from './components/Accounts';
 import Records from './components/Records';
-import SearchAndDelete from './components/SearchAndDelete';
+// import SearchAndDelete from './components/SearchAndDelete';
+import DeletePrototype from './components/DeletePrototype';
 import UserProfile from './components/UserProfile'; // Import UserProfile component
 import Analytics from './components/Analytics'; // Import Analytics component
 
@@ -24,7 +25,7 @@ function App() {
           <Route path="configure" element={<Configure />} />
           <Route path="configure/create" element={<CreateBatch />} />
           <Route path="configure/add" element={<YearbookProfileForm />} />
-          <Route path="configure/delete" element={<SearchAndDelete />} />
+          <Route path="configure/delete" element={<DeletePrototype />} />
           <Route path="configure/edit" element={<EditPrototype />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="records" element={<Records />} />

@@ -331,7 +331,7 @@ app.post("/api/yearbook-profiles", async (req, res) => {
   }
 });
 
-// Get all profiles for Edit profile section
+/// Get all profiles for Edit profile section
 app.get('/profiles', (req, res) => {
   const query = 'SELECT * FROM yearbookprofiles';
   db.query(query, (err, results) => {
@@ -343,21 +343,16 @@ app.get('/profiles', (req, res) => {
 // Get a specific profile by ID
 app.get('/profiles/:profile_id', (req, res) => {
   const { profile_id } = req.params;
-  console.log('Request received for profile ID:', profile_id);  // Log the incoming profile_id
-  
   const query = 'SELECT * FROM yearbookprofiles WHERE profile_id = ?';
   db.query(query, [profile_id], (err, results) => {
     if (err) {
       console.error('Error executing query:', err);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
-    
-    console.log('Query Results:', results);  // Log the query result
-    
     if (results.length > 0) {
-      res.json(results[0]);  // Respond with the specific profile
+      res.json(results[0]);
     } else {
-      res.status(404).json({ message: 'Profile not found' });
+      res.status(404).json({ message: 'Profile not found.' });
     }
   });
 });
@@ -374,6 +369,26 @@ app.put('/profiles/:profile_id', (req, res) => {
   db.query(query, [first_name, middle_name, last_name, course, email, contact_number, birthdate, ambition, profile_id], (err, result) => {
     if (err) throw err;
     res.json({ message: 'Profile updated successfully.' });
+  });
+});
+
+// Delete a profile
+app.delete('/profiles/:profile_id', (req, res) => {
+  const { profile_id } = req.params;
+
+  const query = 'DELETE FROM yearbookprofiles WHERE profile_id = ?';
+  
+  db.query(query, [profile_id], (err, result) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+
+    if (result.affectedRows > 0) {
+      res.json({ message: 'Profile deleted successfully.' });
+    } else {
+      res.status(404).json({ message: 'Profile not found.' });
+    }
   });
 });
 
