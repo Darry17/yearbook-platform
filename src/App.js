@@ -1,19 +1,24 @@
 import React from 'react'; 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// ADMIN
 import MainLayout from './components/MainLayout';
 import Yearbook from './components/Yearbook';
 import Transaction from './components/Transaction';
 import Configure from './components/Configure';
 import CreateBatch from './components/CreateBatch';
-// import AddBatch from './components/AddBatch';
 import EditPrototype from './components/EditPrototype';
 import YearbookProfileForm from './components/YearbookProfileForm';
 import Accounts from './components/Accounts';
 import Records from './components/Records';
-// import SearchAndDelete from './components/SearchAndDelete';
 import DeletePrototype from './components/DeletePrototype';
-import UserProfile from './components/UserProfile'; // Import UserProfile component
-import Analytics from './components/Analytics'; // Import Analytics component
+import UserProfile from './components/UserProfile'; 
+import Analytics from './components/Analytics'; 
+
+//END USERS
+import Login from './users/Login'
+import UsersLayout from './users/UsersLayout'
+import UsersSidebar from './users/UsersSidebar'
 
 function App() {
   return (
@@ -29,13 +34,13 @@ function App() {
           <Route path="configure/edit" element={<EditPrototype />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="records" element={<Records />} />
-          <Route path="analytics" element={<Analytics />} /> {/* Add Analytics Route */}
+          <Route path="analytics" element={<Analytics />} />
         </Route>
-        
-        {/* New Route for User Profile */}
-        <Route path="/user-profile/:profile_id" element={<UserProfile />} />
-        
-        {/* Redirect base path to /main/yearbook */}
+
+        <Route path="/users" element={<UsersLayout />}>
+          <Route path="login" element={<Login />} />
+        </Route>
+    
         <Route path="/" element={<Navigate to="/main/yearbook" replace />} />
       </Routes>
     </Router>
