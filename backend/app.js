@@ -7,10 +7,13 @@ const app = express();
 const db = require("./db");
 const kmeans = require("ml-kmeans");
 const skmeans = require('skmeans');
+const crypto = require('crypto');
+const bodyParser = require('body-parser');
 
 // Enable CORS and JSON middleware
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
+app.use(bodyParser.json());
 
 // Test Route
 app.get("/api/test", (req, res) => {
@@ -486,7 +489,6 @@ app.get("/api/clustering-graduates-by-batch", async (req, res) => {
     res.status(500).json({ error: "Clustering failed" });
   }
 });
-
 
 // Server init
 const port = process.env.PORT || 5000;
