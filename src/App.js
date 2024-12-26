@@ -36,11 +36,6 @@ function App() {
           <Route path="records" element={<Records />} />
           <Route path="analytics" element={<Analytics />} />
         </Route>
-
-        <Route path="/users" element={<UsersLayout />}>
-          <Route path="login" element={<Login />} />
-        </Route>
-    
         <Route path="/" element={<Navigate to="/main/yearbook" replace />} />
       </Routes>
     </Router>
