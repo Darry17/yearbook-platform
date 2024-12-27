@@ -490,6 +490,62 @@ app.get("/api/clustering-graduates-by-batch", async (req, res) => {
   }
 });
 
+// Endpoint to get batch details including users in the same batch
+app.post('/api/getBatch', (req, res) => {
+  const { privateKey } = req.body;
+  
+  if (!privateKey) {
+    return res.status(400).json({ message: 'Private key is required' });
+  }
+
+  const query = `
+    SELECT 
+      b.batch_id, 
+      b.batch_type, 
+      b.batch_year_range, 
+      p.first_name, 
+      p.middle_name, 
+      p.last_name, 
+      p.ambition
+    FROM yearbookprofiles p
+    JOIN yearbookbatches b ON p.batch_id = b.batch_id
+    WHERE p.batch_id = (
+      SELECT p2.batch_id
+      FROM users u
+      JOIN yearbookprofiles p2 ON u.user_id = p2.user_id
+      WHERE u.private_key = ?
+    )
+  `;
+
+  db.query(query, [privateKey], (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return res.status(500).json({ message: 'Database query failed', error: err.message });
+    }
+
+    if (results.length > 0) {
+      // Extract the batch details
+      const batchDetails = {
+        batch_id: results[0].batch_id,
+        batch_type: results[0].batch_type,
+        batch_year_range: results[0].batch_year_range,
+        users: results.map(result => ({
+          first_name: result.first_name,
+          middle_name: result.middle_name,
+          last_name: result.last_name,
+          ambition: result.ambition
+        }))
+      };
+
+      res.json(batchDetails);
+    } else {
+      res.status(404).json({ message: 'No matching batch found' });
+    }
+  });
+});
+
+
+
 // Server init
 const port = process.env.PORT || 5000;
 app.listen(port, '0.0.0.0', () => {

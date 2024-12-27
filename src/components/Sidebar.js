@@ -12,6 +12,7 @@ function Sidebar() {
       <Link to="/main/accounts" className="sidebar-link">Accounts</Link>
       <Link to="/main/records" className="sidebar-link">Records</Link>
       <Link to="/main/analytics" className="sidebar-link">Analytics</Link>
+      <Link to="/main/private" className="sidebar-link">Private</Link>
       <div className="admin-section">
         <p>Admin</p>
       </div>

@@ -14,11 +14,7 @@ import Records from './components/Records';
 import DeletePrototype from './components/DeletePrototype';
 import UserProfile from './components/UserProfile'; 
 import Analytics from './components/Analytics'; 
-
-//END USERS
-import Login from './users/Login'
-import UsersLayout from './users/UsersLayout'
-import UsersSidebar from './users/UsersSidebar'
+import Private from './components/Private';
 
 function App() {
   return (
@@ -35,6 +31,7 @@ function App() {
           <Route path="accounts" element={<Accounts />} />
           <Route path="records" element={<Records />} />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="private" element={<Private />} />
         </Route>
         <Route path="/" element={<Navigate to="/main/yearbook" replace />} />
       </Routes>
